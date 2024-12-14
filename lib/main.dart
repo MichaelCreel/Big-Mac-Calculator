@@ -1,24 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:expression_language/expression_language.dart';
-import 'package:window_manager/window_manager.dart';
+import 'desktop.dart' if (dart.library.io) 'mobile.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(700, 566),
-    minimumSize: Size(375, 566),
-    center: true,
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.normal,
-  );
-  windowManager.waitUntilReadyToShow(
-    windowOptions, () async {
-      await windowManager.show();
-      await windowManager.focus();
-  }
-  );
+  await initializeApp();
   runApp(MyApp());
 }
 
@@ -100,6 +85,12 @@ class CalculatorState extends State<Calculator> {
         equation = Solve("$equation/0.215");
         history1 += 'kg\u2192W';
         unit = 'Big Macs';
+      } else if (buttonText == ".") {
+        if (equation.isEmpty || equation.endsWith('+') || equation.endsWith('-') || equation.endsWith('*') || equation.endsWith('/')) {
+          equation += '0.';
+        } else {
+          equation += '.';
+        }
       } else {
         equation += buttonText;
       }
