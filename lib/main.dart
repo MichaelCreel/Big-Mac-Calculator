@@ -1,16 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:expression_language/expression_language.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    primaryColor: Colors.grey[900],
+    scaffoldBackgroundColor: Colors.grey[900]
+  );
+
+  ThemeData lightTheme = ThemeData(
+    brightness: Brightness.light,
+    primaryColor: Colors.grey[50],
+    scaffoldBackgroundColor: Colors.grey[50]
+  );
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.system,
       home: Scaffold(
         appBar: AppBar(
           title: Text('Big Mac Calculator'),
@@ -27,25 +42,35 @@ class Calculator extends StatefulWidget {
 }
 
 class CalculatorState extends State<Calculator> {
-  String _output = '0';
-  String _memory = '';
+  String equation = '';
+  String memory = '';
+  String unit = '';
 
   void buttonPressed(String buttonText) {
     setState(() {
       if (buttonText == 'C') {
-        _output = '';
+        equation = '';
       } else if (buttonText == '=') {
-        //CALCULATOR HERE
+        equation = Solve(equation);
       } else if (buttonText == 'DEL') {
-        if (_output != '') {
-          _output = _output.substring(0, _output.length - 1);
+        if (equation != '') {
+          equation = equation.substring(0, equation.length - 1);
         }
       } else if (buttonText == 'M+') {
-        _memory = _output;
+        memory = equation;
       } else if (buttonText == 'MP') {
-        _output += _memory;
+        equation += memory;
+      } else if (buttonText == 'm\u2192d') {
+        equation = Solve(equation);
+        equation = Solve("$equation/0.09525");
+      } else if (buttonText == 'm\u00B3\u2192V') {
+        equation = Solve(equation);
+        equation = Solve("$equation/0.00041");
+      } else if (buttonText == 'kg\u2192W') {
+        equation = Solve(equation);
+        equation = Solve("$equation/0.215");
       } else {
-        _output += buttonText;
+        equation += buttonText;
       }
     });
   }
@@ -66,7 +91,7 @@ class CalculatorState extends State<Calculator> {
         Container(
           padding: EdgeInsets.all(20.0),
           alignment: Alignment.centerRight,
-          child: Text(_output,
+          child: Text(equation,
             style: TextStyle(fontSize: 48.0, fontWeight: FontWeight.bold),),
         ),
         Divider(),
@@ -105,11 +130,25 @@ class CalculatorState extends State<Calculator> {
                 _buildButton('C'),
                 _buildButton('M+'),
                 _buildButton('MP'),
+                _buildButton('='),
+              ],),
+              Row(children: <Widget>[
+                _buildButton('m\u2192d'),
+                _buildButton('m\u00B3\u2192V'),
+                _buildButton('kg\u2192W')
               ],)
             ],
           ),
         ),
       ],
     );
+  }
+
+  String Solve(String input) {
+    var context = <String, ExpressionProviderElement>{};
+    var expressionParser = ExpressionParser(context);
+    var parsedExpression = expressionParser.parse(input);
+    var evaluator = parsedExpression.evaluate();
+    return evaluator.toString();
   }
 }

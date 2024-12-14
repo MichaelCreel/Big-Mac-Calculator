@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  expression_language:
+    dependency: "direct dev"
+    description:
+      name: expression_language
+      sha256: "252e609dc3bfa47e18deaeb924853b836b769cfaed38ab9cfdb7a295bfafc390"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   fake_async:
     dependency: transitive
     description:
@@ -139,6 +147,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.0"
+  petitparser:
+    dependency: transitive
+    description:
+      name: petitparser
+      sha256: "1a914995d4ef10c94ff183528c120d35ed43b5eaa8713fc6766a9be4570782e2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.4.0"
+  rational:
+    dependency: transitive
+    description:
+      name: rational
+      sha256: "49ba0eb1a7b0d39358998cbbd4d4a384382a83ac02f433aefc567853c84ed975"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.1"
   sky_engine:
     dependency: transitive
     description: flutter
