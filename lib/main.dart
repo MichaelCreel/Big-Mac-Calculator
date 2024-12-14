@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:expression_language/expression_language.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+  WindowOptions windowOptions = const WindowOptions(
+    size: Size(700, 566),
+    minimumSize: Size(375, 566),
+    center: true,
+    backgroundColor: Colors.transparent,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.normal,
+  );
+  windowManager.waitUntilReadyToShow(
+    windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+  }
+  );
   runApp(MyApp());
 }
 
@@ -42,14 +59,22 @@ class Calculator extends StatefulWidget {
 }
 
 class CalculatorState extends State<Calculator> {
+  String history2 = '';
+  String history1 = '';
   String equation = '';
   String memory = '';
   String unit = '';
 
   void buttonPressed(String buttonText) {
     setState(() {
+      unit = '';
       if (buttonText == 'C') {
-        equation = '';
+        if (equation != '') {
+          equation = '';
+        } else {
+          history1 = '';
+          history2 = '';
+        }
       } else if (buttonText == '=') {
         equation = Solve(equation);
       } else if (buttonText == 'DEL') {
@@ -63,12 +88,18 @@ class CalculatorState extends State<Calculator> {
       } else if (buttonText == 'm\u2192d') {
         equation = Solve(equation);
         equation = Solve("$equation/0.09525");
+        history1 += 'm\u2192d';
+        unit = 'Big Mac Diameters';
       } else if (buttonText == 'm\u00B3\u2192V') {
         equation = Solve(equation);
         equation = Solve("$equation/0.00041");
+        history1 += 'm\u00B3\u2192V';
+        unit = 'Big Macs';
       } else if (buttonText == 'kg\u2192W') {
         equation = Solve(equation);
         equation = Solve("$equation/0.215");
+        history1 += 'kg\u2192W';
+        unit = 'Big Macs';
       } else {
         equation += buttonText;
       }
@@ -91,9 +122,15 @@ class CalculatorState extends State<Calculator> {
         Container(
           padding: EdgeInsets.all(20.0),
           alignment: Alignment.centerRight,
-          child: Text(equation,
-            style: TextStyle(fontSize: 48.0, fontWeight: FontWeight.bold),),
-        ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(history2, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),),
+              Text(history1, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),),
+              Text(equation, style: TextStyle(fontSize: 48.0, fontWeight: FontWeight.bold),),
+              Text(unit, style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.normal,)),
+            ],
+          )),
         Divider(),
         Expanded(
           child: Column(
@@ -145,10 +182,15 @@ class CalculatorState extends State<Calculator> {
   }
 
   String Solve(String input) {
-    var context = <String, ExpressionProviderElement>{};
-    var expressionParser = ExpressionParser(context);
-    var parsedExpression = expressionParser.parse(input);
-    var evaluator = parsedExpression.evaluate();
-    return evaluator.toString();
+    if (input != '') {
+      history2 = history1;
+      history1 = equation;
+      var context = <String, ExpressionProviderElement>{};
+      var expressionParser = ExpressionParser(context);
+      var parsedExpression = expressionParser.parse(input);
+      var evaluator = parsedExpression.evaluate();
+      return evaluator.toString();
+    }
+    return '';
   }
 }
